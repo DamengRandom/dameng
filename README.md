@@ -1,10 +1,11 @@
 # Dameng
 
 A scroll-driven, cinematic CV/portfolio site for an AI agent engineer, rendered live in Three.js.
-Inspired by [MengTo/kage](https://github.com/MengTo/kage)'s technique — a fixed WebGL canvas driven by
-scroll, layered with generated cinematic stills and alpha-cutout foreground art — reinterpreted around
-an original "Deploy" theme: a night orchestration space of grid terrain, node clusters, and light
-pulses, instead of a temple.
+A fixed WebGL canvas driven by scroll, layered with generated cinematic stills and alpha-cutout
+foreground art, built around an original "Deploy" theme: a night orchestration space of grid
+terrain, node clusters, and light pulses.
+
+See [`PROMPT.md`](PROMPT.md) for the full build brief.
 
 ## Run locally
 
@@ -27,9 +28,11 @@ npx serve .
 ```text
 dameng/
 ├── index.html              # structure, CSS, scene code, and scroll choreography — single file
+├── PROMPT.md               # build brief / reusable technique prompt for this site
 ├── vendor/
 │   └── three.module.js     # vendored Three.js r169 (MIT), no npm install needed
 ├── assets/
+│   ├── favicon.svg         # nav/favicon logomark
 │   ├── generated/          # Leonardo-generated background plates (4)
 │   └── foreground/         # Leonardo-generated alpha-cutout foreground props (6)
 ├── scripts/

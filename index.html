@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Damon Wu — AI Agent Engineer</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <style>
   :root{
     --bg:#050607;
@@ -39,7 +40,8 @@
     padding:1.4rem 2rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;
     pointer-events:none;
   }
-  nav .brand{color:var(--green);pointer-events:auto}
+  nav .brand{color:var(--green);pointer-events:auto;display:flex;align-items:center;gap:.55rem}
+  nav .brand img{width:1.15rem;height:1.15rem;display:block}
   nav ul{list-style:none;display:flex;gap:1.6rem;margin:0;padding:0;pointer-events:auto}
   nav a{color:var(--text-dim);text-decoration:none;transition:color .3s}
   nav a:hover,nav a.active{color:var(--green)}
@@ -166,7 +168,7 @@
 <div id="cursor"></div>
 
 <nav>
-  <span class="brand">DAMENG</span>
+  <span class="brand"><img src="assets/favicon.svg" alt="">DAMENG</span>
   <ul>
     <li><a href="#initialize" data-nav>Initialize</a></li>
     <li><a href="#experience" data-nav>Experience</a></li>

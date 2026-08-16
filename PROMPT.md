@@ -1,9 +1,18 @@
-# Dameng — CV/portfolio site design spec
+# Dameng — build brief
 
-Personal CV/portfolio website for an FDE-style software engineer (TypeScript/JavaScript,
-builds AI agents with LangChain and the Claude Code SDK to solve business problems).
-Architecture pattern: a fixed Three.js canvas driven by scroll, layered with generated-art
-depth layers and editorial typography — original theme and code throughout.
+The prompt this site was built from. Reusable as a technique brief for anyone building a
+similar scroll-driven, cinematic single-page site — the *pattern* is generic, the theme,
+copy, code, and generated art here are original to this project and are not licensed for
+reuse as-is.
+
+## 0. Brief
+
+> Build a scroll-driven, cinematic CV/portfolio site for an AI agent engineer, rendered
+> live in Three.js: a fixed WebGL canvas driven by scroll position, layered with
+> generated cinematic background stills and alpha-cutout foreground props for depth,
+> under editorial monospace/sans typography. No framework, no build step — a single
+> static HTML file deployable as-is to GitHub Pages. Six chapters, each pairing one
+> beat of CV content with one beat of the 3D scene.
 
 ## 1. World concept
 
@@ -16,6 +25,8 @@ composition. Camera moves through the space on scroll.
 
 ## 2. Site structure
 
+Six chapters, each one beat of CV content paired with one beat of the live 3D scene:
+
 | # | Chapter | CV content | Live 3D | Generated assets |
 |---|---|---|---|---|
 | 1 | Boot (hero) | Name / role identity | Camera opens on the orb, title types in, scroll cue | none — live render |
@@ -24,10 +35,6 @@ composition. Camera moves through the space on scroll.
 | 4 | Projects | Agent projects — LangChain/Claude Code SDK work (max 3) | Distinct pulse/node per project | 1 background plate + foreground props |
 | 5 | Signal (skills) | Tech stack as a constellation/rail of tool nodes | Mostly live geometry + type, no images needed | none |
 | 6 | Afterlight (contact/footer) | Contact links, closing statement | Camera pulls back/ascends, grid dims | 1 background plate |
-
-Content readiness: real company/project names not final yet — use placeholder copy
-styled after typical AI Solutions Engineer / SDE job descriptions; swap in real content
-later without restructuring chapters.
 
 ## 3. Visual style
 
@@ -43,7 +50,7 @@ oversized headings; clean sans for body copy. Small monospace atmosphere text
 (commit-hash-style codes, `● ACTIVE` status strings, timestamps) serves as the
 decorative technical accent.
 
-**Leonardo shot list** (10 images total, style-prefixed for cohesion):
+**Generated-image prompt template** (10 images total, style-prefixed for cohesion):
 
 > Prompt prefix: *"Cinematic dark technical illustration, near-black background,
 > glowing GitHub-green (#39d353) and warm amber accent lighting, volumetric fog,
@@ -64,15 +71,19 @@ Foreground alpha-cutouts (6, transparent props, reused across chapters):
 5. Jagged circuit-fragment silhouette
 6. Flowing signal-wave ribbon
 
-Note: Leonardo output won't have clean alpha — foreground cutouts need a
-background-removal pass (e.g. remove.bg) after generation.
+Note: raw generated output won't have clean alpha — foreground cutouts need a
+background-removal pass after generation.
+
+**Mark**: the nav/favicon logomark reuses the same motif as the hero object — an orb
+ring in the green ramp with a single amber pulse dot on the rim — so the brand mark
+literally reads as a miniature of the live scene.
 
 ## 4. Technical architecture
 
 **Structure**: single `index.html` (structure + CSS + scene code + choreography) +
-vendored `three.min.js`. No framework, no build step, no npm — static files, deployable
-to GitHub Pages as-is. `assets/generated/` for background plates, `assets/foreground/`
-for alpha cutouts.
+vendored `three.module.js`. No framework, no build step, no npm — static files,
+deployable to GitHub Pages as-is. `assets/generated/` for background plates,
+`assets/foreground/` for alpha cutouts.
 
 **Scene composition**:
 - Terrain: grid-of-cells plane, cell brightness/height evokes a contribution graph
@@ -92,12 +103,11 @@ for alpha cutouts.
 2. Live world — grid terrain + orb + scroll-damped camera (get one chapter right first)
 3. Node clusters/pulses per chapter + foreground `IntersectionObserver` wiring
    (placeholder art)
-4. Generate the 10 Leonardo images, swap in
+4. Generate the 10 images, swap in
 5. Polish — grain/vignette/bloom, reduced-motion, mobile responsive, a11y labels
 6. Real CV copy replaces placeholders
 
-**Quality bar** (see `PROMPT.md` checklist): verify desktop and
-~390×844 mobile, no 404s on any asset, clean browser console, one full scroll/nav
-interaction tested end to end, reduced-motion preserves the complete reading
-experience, semantic landmarks and accessible labels, custom cursor only on
-fine-pointer devices.
+**Quality bar**: verify desktop and ~390×844 mobile, no 404s on any asset, clean
+browser console, one full scroll/nav interaction tested end to end, reduced-motion
+preserves the complete reading experience, semantic landmarks and accessible labels,
+custom cursor only on fine-pointer devices.
