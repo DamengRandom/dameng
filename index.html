@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Damon Wu — AI Agent Engineer</title>
+<style>
+  :root{
+    --bg:#050607;
+    --green-dim:#0e4429;
+    --green-mid:#26a641;
+    --green:#39d353;
+    --amber:#d29922;
+    --text:#e6edf3;
+    --text-dim:#8b949e;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", "IBM Plex Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--sans);}
+  body{overflow-x:hidden}
+
+  #scene{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;display:block;}
+
+  #vignette{
+    position:fixed;inset:0;z-index:2;pointer-events:none;
+    background:radial-gradient(ellipse at center, rgba(0,0,0,0) 45%, rgba(0,0,0,.55) 100%);
+  }
+  #grain{
+    position:fixed;inset:0;z-index:3;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.4) 0 1px, transparent 1px 2px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.4) 0 1px, transparent 1px 2px);
+  }
+
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:10;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:1.4rem 2rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;
+    pointer-events:none;
+  }
+  nav .brand{color:var(--green);pointer-events:auto}
+  nav ul{list-style:none;display:flex;gap:1.6rem;margin:0;padding:0;pointer-events:auto}
+  nav a{color:var(--text-dim);text-decoration:none;transition:color .3s}
+  nav a:hover,nav a.active{color:var(--green)}
+
+  main{position:relative;z-index:5}
+  section{
+    position:relative;min-height:100vh;display:flex;flex-direction:column;
+    justify-content:center;padding:0 2rem;
+  }
+  section.tall{min-height:150vh}
+
+  .label{
+    font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;color:var(--amber);
+    margin-bottom:.9rem;display:flex;align-items:center;gap:.6rem;
+  }
+  .label .dot{width:6px;height:6px;border-radius:50%;background:var(--amber);box-shadow:0 0 8px var(--amber)}
+  .label .rule{flex:0 0 32px;height:1px;background:var(--text-dim);opacity:.4}
+
+  h1,h2{
+    font-family:var(--mono);font-weight:600;color:var(--text);margin:0 0 1rem;
+    letter-spacing:-.01em;line-height:1.05;max-width:16ch;
+  }
+  h1{font-size:clamp(2.4rem,7vw,5.2rem)}
+  h2{font-size:clamp(1.8rem,4.5vw,3.2rem)}
+  .word{display:inline-block;opacity:0;transform:translateY(.3em);
+    transition:opacity .6s ease, transform .6s ease;}
+  .word.revealed{opacity:1;transform:translateY(0)}
+
+  p.lead{font-size:clamp(1rem,1.6vw,1.25rem);color:var(--text-dim);max-width:52ch;line-height:1.6}
+
+  .content-wrap{max-width:1100px;margin:0 auto;width:100%;position:relative;z-index:2}
+
+  .chapters{display:flex;gap:1.2rem;margin-top:2.4rem;font-family:var(--mono);font-size:.72rem;color:var(--text-dim)}
+  .chapters span{padding:.3rem .6rem;border:1px solid rgba(255,255,255,.08);border-radius:4px}
+  .scroll-cue{
+    position:absolute;bottom:2.4rem;left:2rem;font-family:var(--mono);font-size:.68rem;
+    color:var(--text-dim);letter-spacing:.1em;display:flex;align-items:center;gap:.5rem;
+    transition:opacity .3s ease;
+  }
+  .scroll-cue::after{content:'';width:1px;height:28px;background:linear-gradient(var(--green),transparent);animation:cue 1.8s ease-in-out infinite}
+  @keyframes cue{0%,100%{opacity:.2}50%{opacity:1}}
+
+  /* --- role / project cards --- */
+  .stack{display:flex;flex-direction:column;gap:5rem;margin-top:2rem}
+  .card{
+    border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:1.8rem 2rem;
+    background:linear-gradient(180deg, rgba(14,68,41,.14), rgba(5,6,7,.5));
+    backdrop-filter:blur(6px);max-width:720px;
+  }
+  .card .role-meta{font-family:var(--mono);font-size:.7rem;color:var(--green);letter-spacing:.08em;margin-bottom:.4rem}
+  .card h3{margin:.2rem 0 .8rem;font-family:var(--mono);font-size:1.3rem;color:var(--text)}
+  .card ul{margin:0;padding-left:1.1rem;color:var(--text-dim);font-size:.92rem;line-height:1.7}
+  .card ul li::marker{color:var(--amber)}
+
+  /* --- skills rail --- */
+  .rail{display:flex;flex-wrap:wrap;gap:.7rem;max-width:760px}
+  .chip{
+    font-family:var(--mono);font-size:.78rem;padding:.5rem .9rem;border-radius:999px;
+    border:1px solid rgba(57,211,83,.3);color:var(--green);background:rgba(57,211,83,.06);
+  }
+
+  footer{padding:6rem 2rem 4rem;font-family:var(--mono);font-size:.85rem;color:var(--text-dim)}
+  footer a{color:var(--green);text-decoration:none}
+  footer .links{display:flex;gap:1.6rem;margin-top:1rem}
+
+  /* --- foreground placeholder layers (stand in for Leonardo cutouts) --- */
+  .fg-stage{
+    position:absolute;left:0;right:0;bottom:0;height:38vh;pointer-events:none;
+    z-index:1;overflow:hidden;
+  }
+  .fg-prop{
+    position:absolute;bottom:0;padding:.4rem .7rem;font-family:var(--mono);font-size:.62rem;
+    color:var(--text-dim);border:1px dashed rgba(57,211,83,.35);border-radius:6px;
+    background:rgba(5,6,7,.55);
+    opacity:0;filter:blur(6px);transform:translateY(24px);
+    transition:opacity .9s ease, filter .9s ease, transform .9s ease;
+  }
+  .fg-stage.fg-active .fg-prop{opacity:.85;filter:blur(0);transform:translateY(0)}
+  .fg-stage.fg-retiring .fg-prop{opacity:0;filter:blur(10px);transform:translateY(10px)}
+
+  /* --- background plate placeholder --- */
+  .plate{
+    position:absolute;inset:0;z-index:0;opacity:0;transition:opacity 1.2s ease;
+    background:radial-gradient(ellipse at 30% 40%, rgba(57,211,83,.12), transparent 60%);
+  }
+  section.in-view .plate{opacity:1}
+  .plate-tag{
+    position:absolute;top:1.6rem;right:2rem;font-family:var(--mono);font-size:.62rem;
+    color:var(--text-dim);opacity:.5;
+  }
+
+  @media (max-width:640px){
+    nav ul{display:none}
+    section{padding:0 1.2rem}
+    .fg-stage{height:24vh}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    .word{opacity:1!important;transform:none!important;transition:none!important}
+    .fg-prop{opacity:.85!important;filter:none!important;transform:none!important;transition:none!important}
+    .scroll-cue::after{animation:none}
+  }
+
+  html.fine-pointer body{cursor:none}
+  #cursor{
+    position:fixed;top:0;left:0;width:16px;height:16px;border-radius:50%;
+    border:1px solid var(--green);z-index:999;pointer-events:none;
+    transform:translate(-50%,-50%);transition:width .2s,height .2s,opacity .2s;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="scene"></canvas>
+<div id="vignette"></div>
+<div id="grain"></div>
+<div id="cursor"></div>
+
+<nav>
+  <span class="brand">DAMENG</span>
+  <ul>
+    <li><a href="#initialize" data-nav>Initialize</a></li>
+    <li><a href="#experience" data-nav>Experience</a></li>
+    <li><a href="#projects" data-nav>Projects</a></li>
+    <li><a href="#signal" data-nav>Signal</a></li>
+    <li><a href="#afterlight" data-nav>Contact</a></li>
+  </ul>
+</nav>
+
+<main>
+
+  <section id="boot" aria-label="Intro">
+    <div class="content-wrap">
+      <div class="label"><span class="dot"></span>CHAPTER 00 — BOOT<span class="rule"></span></div>
+      <h1 data-reveal>Damon Wu</h1>
+      <p class="lead">AI Agent Engineer &amp; Forward-Deployed Software Engineer.
+        I design and ship autonomous agents — on LangChain and the Claude Code SDK —
+        that solve real business problems inside real production systems.</p>
+      <div class="chapters">
+        <span>01 Experience</span><span>02 Projects</span><span>03 Signal</span><span>04 Contact</span>
+      </div>
+    </div>
+    <div class="scroll-cue">SCROLL TO ENTER</div>
+  </section>
+
+  <section id="initialize" aria-label="About" data-chapter="1">
+    <div class="plate"></div><div class="plate-tag">plate: initialize-grid.webp</div>
+    <div class="content-wrap">
+      <div class="label"><span class="dot"></span>CHAPTER 01 — INITIALIZE<span class="rule"></span></div>
+      <h2 data-reveal>Where agents meet the business.</h2>
+      <p class="lead">I'm a software engineer specializing in TypeScript and JavaScript,
+        focused on designing, building, and deploying autonomous AI agents inside real
+        business workflows. I work close to the problem — embedded with teams, shipping
+        agentic systems on frameworks like LangChain and the Claude Code SDK — turning
+        ambiguous business pain into working, production software.</p>
+    </div>
+    <div class="fg-stage" data-fg>
+      <div class="fg-prop" style="left:6%">terminal-frame.webp</div>
+      <div class="fg-prop" style="left:34%">connector-node.webp</div>
+      <div class="fg-prop" style="right:8%">signal-ribbon.webp</div>
+    </div>
+  </section>
+
+  <section id="experience" class="tall" aria-label="Experience" data-chapter="2">
+    <div class="plate"></div><div class="plate-tag">plate: node-cluster.webp</div>
+    <div class="content-wrap">
+      <div class="label"><span class="dot"></span>CHAPTER 02 — EXPERIENCE<span class="rule"></span></div>
+      <h2 data-reveal>Shipped in production.</h2>
+      <div class="stack">
+        <div class="card">
+          <div class="role-meta">2024 — PRESENT · FORWARD DEPLOYED ENGINEER · [COMPANY A]</div>
+          <h3>Embedded agent delivery</h3>
+          <ul>
+            <li>Designed and deployed LangChain-based agent pipelines directly inside client workflows, replacing manual triage processes.</li>
+            <li>Built internal tool-calling integrations connecting agents to existing business systems (CRM, ticketing, data warehouses).</li>
+            <li>Owned the full loop from ambiguous business ask to measured production outcome.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="role-meta">2022 — 2024 · AI SOLUTIONS ENGINEER · [COMPANY B]</div>
+          <h3>Agent platform &amp; evaluation</h3>
+          <ul>
+            <li>Built evaluation and observability tooling for agent behavior in production.</li>
+            <li>Shipped Claude Code SDK-based internal developer tooling adopted org-wide.</li>
+            <li>Partnered with non-technical stakeholders to translate business pain into agent specs.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="role-meta">2020 — 2022 · SOFTWARE DEVELOPMENT ENGINEER · [COMPANY C]</div>
+          <h3>Full-stack foundations</h3>
+          <ul>
+            <li>Built and maintained TypeScript/Node services powering core product workflows.</li>
+            <li>Owned front-end architecture for internal tools used by cross-functional teams.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="fg-stage" data-fg>
+      <div class="fg-prop" style="left:10%">cable-bundle.webp</div>
+      <div class="fg-prop" style="left:44%">circuit-fragment.webp</div>
+      <div class="fg-prop" style="right:6%">terminal-frame.webp</div>
+    </div>
+  </section>
+
+  <section id="projects" class="tall" aria-label="Projects" data-chapter="3">
+    <div class="plate"></div><div class="plate-tag">plate: pulse-transit.webp</div>
+    <div class="content-wrap">
+      <div class="label"><span class="dot"></span>CHAPTER 03 — PROJECTS<span class="rule"></span></div>
+      <h2 data-reveal>Agents in the wild.</h2>
+      <div class="stack">
+        <div class="card">
+          <div class="role-meta">LANGCHAIN · MULTI-TOOL AGENT</div>
+          <h3>Support Agent Orchestrator</h3>
+          <ul>
+            <li>Multi-tool agent automating tier-1 support triage across three internal systems.</li>
+            <li>Cut manual handling time by routing routine cases end-to-end.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="role-meta">CLAUDE CODE SDK · DEV TOOLING</div>
+          <h3>Codebase Copilot</h3>
+          <ul>
+            <li>Internal agent that answers codebase questions and drafts PRs against real repos.</li>
+            <li>Built on the Claude Code SDK with custom tool definitions for the org's stack.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="role-meta">TYPESCRIPT · SIGNAL MONITORING</div>
+          <h3>Ops Signal Agent</h3>
+          <ul>
+            <li>Watches business metrics, flags anomalies, and triggers agent-driven remediation workflows.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="fg-stage" data-fg>
+      <div class="fg-prop" style="left:14%">code-glyphs.webp</div>
+      <div class="fg-prop" style="right:12%">signal-ribbon.webp</div>
+    </div>
+  </section>
+
+  <section id="signal" aria-label="Skills" data-chapter="4">
+    <div class="content-wrap">
+      <div class="label"><span class="dot"></span>CHAPTER 04 — SIGNAL<span class="rule"></span></div>
+      <h2 data-reveal>Stack.</h2>
+      <div class="rail">
+        <span class="chip">TypeScript</span><span class="chip">Node.js</span>
+        <span class="chip">LangChain</span><span class="chip">Claude Code SDK</span>
+        <span class="chip">React</span><span class="chip">Three.js / WebGL</span>
+        <span class="chip">Agent orchestration</span><span class="chip">Prompt engineering</span>
+        <span class="chip">Eval &amp; observability</span><span class="chip">AWS / GCP</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="afterlight" aria-label="Contact" data-chapter="5">
+    <div class="plate"></div><div class="plate-tag">plate: afterlight-wide.webp</div>
+    <div class="content-wrap">
+      <div class="label"><span class="dot"></span>CHAPTER 05 — AFTERLIGHT<span class="rule"></span></div>
+      <h2 data-reveal>Let's build the agent.</h2>
+      <p class="lead">Open to Forward-Deployed / AI Solutions Engineer roles where shipping
+        agents into real workflows is the job.</p>
+    </div>
+    <div class="fg-stage" data-fg>
+      <div class="fg-prop" style="left:20%">connector-node.webp</div>
+    </div>
+  </section>
+
+  <footer>
+    <div>© 2026 Damon Wu — placeholder copy, swap in real details.</div>
+    <div class="links">
+      <a href="mailto:damonmaozewu@gmail.com">email</a>
+      <a href="#">github</a>
+      <a href="#">linkedin</a>
+    </div>
+  </footer>
+
+</main>
+
+<script type="module">
+import * as THREE from './vendor/three.module.js';
+
+const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $  = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const clamp = (v,a,b) => Math.min(b, Math.max(a, v));
+const lerp  = (a,b,t) => a + (b - a) * t;
+const damp  = (cur,to,rate,dt) => lerp(cur, to, 1 - Math.exp(-rate * dt));
+
+/* ---------------- custom cursor (fine pointer only) ---------------- */
+if (matchMedia('(pointer:fine)').matches) {
+  document.documentElement.classList.add('fine-pointer');
+  const cursor = $('#cursor');
+  addEventListener('pointermove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+  });
+}
+
+/* ---------------- word-by-word heading reveal ---------------- */
+$$('[data-reveal]').forEach(el => {
+  const words = el.textContent.trim().split(/\s+/);
+  el.textContent = '';
+  words.forEach((w, i) => {
+    const span = document.createElement('span');
+    span.className = 'word';
+    span.style.transitionDelay = (i * 0.06) + 's';
+    span.textContent = w + ' ';
+    el.appendChild(span);
+  });
+});
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.word').forEach(w => w.classList.add('revealed'));
+      e.target.closest('section')?.classList.add('in-view');
+    }
+  });
+}, { threshold: .4 });
+$$('[data-reveal]').forEach(el => revealObserver.observe(el));
+
+/* ---------------- foreground layer pin/fade per section ---------------- */
+(() => {
+  const stages = $$('[data-fg]');
+  const sections = stages.map(s => s.closest('section'));
+  const ratios = new Map();
+  let active = null;
+  const activate = stage => {
+    if (!stage || stage === active) return;
+    stages.forEach(s => s.classList.remove('fg-active'));
+    if (active) active.classList.add('fg-retiring');
+    stage.classList.remove('fg-retiring');
+    stage.classList.add('fg-active');
+    active = stage;
+  };
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => ratios.set(e.target, e.isIntersecting ? e.intersectionRatio : 0));
+    let best = null, bestR = 0;
+    sections.forEach((sec, i) => {
+      const r = ratios.get(sec) || 0;
+      if (r > bestR) { bestR = r; best = stages[i]; }
+    });
+    if (bestR > 0) activate(best);
+  }, { rootMargin: '-10% 0px -10% 0px', threshold: [0, .15, .35, .6] });
+  sections.forEach(s => io.observe(s));
+})();
+
+/* ---------------- nav active-link highlight ---------------- */
+(() => {
+  const links = $$('nav a[data-nav]');
+  const map = new Map(links.map(a => [document.querySelector(a.getAttribute('href')), a]));
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      const link = map.get(e.target);
+      if (!link) return;
+      if (e.isIntersecting) { links.forEach(l => l.classList.remove('active')); link.classList.add('active'); }
+    });
+  }, { rootMargin: '-45% 0px -45% 0px' });
+  map.forEach((_, sec) => io.observe(sec));
+})();
+
+/* ---------------- three.js world: "Deploy" ---------------- */
+const canvas = $('#scene');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.setClearColor(0x050607, 1);
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x050607, 0.028);
+
+const camera = new THREE.PerspectiveCamera(52, innerWidth / innerHeight, 0.1, 200);
+
+/* grid terrain — reads as a contribution graph stretching into the distance */
+const GRID_COLS = 26, GRID_ROWS = 60, CELL = 0.62;
+const cellGeo = new THREE.PlaneGeometry(CELL * 0.82, CELL * 0.82);
+const cellMat = new THREE.MeshBasicMaterial({ color: 0x0e4429, transparent: true, opacity: 0.55 });
+const cells = new THREE.InstancedMesh(cellGeo, cellMat, GRID_COLS * GRID_ROWS);
+cells.rotation.x = -Math.PI / 2;
+{
+  const m = new THREE.Matrix4();
+  const color = new THREE.Color();
+  const colors = [0x0e4429, 0x1c6b34, 0x26a641, 0x39d353];
+  let idx = 0;
+  for (let r = 0; r < GRID_ROWS; r++) {
+    for (let c = 0; c < GRID_COLS; c++) {
+      const x = (c - GRID_COLS / 2) * CELL;
+      const z = -r * CELL;
+      m.makeTranslation(x, 0, z);
+      cells.setMatrixAt(idx, m);
+      const intensity = Math.random();
+      color.set(colors[intensity > .92 ? 3 : intensity > .78 ? 2 : intensity > .55 ? 1 : 0]);
+      cells.setColorAt(idx, color);
+      idx++;
+    }
+  }
+  cells.instanceMatrix.needsUpdate = true;
+  cells.instanceColor.needsUpdate = true;
+}
+cells.material.vertexColors = true;
+scene.add(cells);
+
+/* central orchestration orb */
+const orbGroup = new THREE.Group();
+const orbCore = new THREE.Mesh(
+  new THREE.IcosahedronGeometry(1.6, 1),
+  new THREE.MeshBasicMaterial({ color: 0x39d353, wireframe: true, transparent: true, opacity: 0.55 })
+);
+const orbGlow = new THREE.Mesh(
+  new THREE.IcosahedronGeometry(1.3, 0),
+  new THREE.MeshBasicMaterial({ color: 0x0e4429, transparent: true, opacity: 0.25 })
+);
+orbGroup.add(orbCore, orbGlow);
+orbGroup.position.set(0, 2.4, -4);
+scene.add(orbGroup);
+
+/* node clusters — one per chapter stop */
+const NODE_Z = [-4, -14, -26, -40, -52, -64]; // boot, initialize, experience, projects, signal, afterlight
+const nodeGroup = new THREE.Group();
+const nodePositions = [];
+NODE_Z.forEach((z, i) => {
+  if (i === 0) { nodePositions.push(new THREE.Vector3(0, 2.4, z)); return; } // orb IS the boot node
+  const x = (i % 2 === 0 ? 1 : -1) * 3.2;
+  const y = 1.6;
+  const pos = new THREE.Vector3(x, y, z);
+  nodePositions.push(pos);
+  const node = new THREE.Mesh(
+    new THREE.OctahedronGeometry(0.55, 0),
+    new THREE.MeshBasicMaterial({ color: 0x26a641, wireframe: true, transparent: true, opacity: 0.7 })
+  );
+  node.position.copy(pos);
+  nodeGroup.add(node);
+});
+scene.add(nodeGroup);
+
+/* camera path spline through all stops */
+const pathPoints = nodePositions.map(p => new THREE.Vector3(p.x * 0.35, p.y + 0.4, p.z + 3.2));
+const curve = new THREE.CatmullRomCurve3(pathPoints, false, 'catmullrom', 0.4);
+
+/* light pulses traveling between consecutive nodes */
+const PULSE_COUNT = 14;
+const pulseGeo = new THREE.SphereGeometry(0.07, 8, 8);
+const pulseMat = new THREE.MeshBasicMaterial({ color: 0xd29922 });
+const pulses = [];
+for (let i = 0; i < PULSE_COUNT; i++) {
+  const a = nodePositions[Math.floor(Math.random() * (nodePositions.length - 1))];
+  const bIdx = Math.min(nodePositions.length - 1, nodePositions.indexOf(a) + 1);
+  const b = nodePositions[bIdx];
+  const mesh = new THREE.Mesh(pulseGeo, pulseMat.clone());
+  scene.add(mesh);
+  pulses.push({ mesh, a, b, t: Math.random(), speed: 0.15 + Math.random() * 0.2 });
+}
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+/* scroll-damped camera rig */
+const RIG = { prog: 0, smooth: 0, mx: 0, my: 0, tmx: 0, tmy: 0 };
+addEventListener('pointermove', e => {
+  RIG.tmx = (e.clientX / innerWidth) * 2 - 1;
+  RIG.tmy = -((e.clientY / innerHeight) * 2 - 1);
+});
+
+function scrollProgress() {
+  const max = document.documentElement.scrollHeight - innerHeight;
+  return clamp(max > 0 ? scrollY / max : 0, 0, 1);
+}
+
+/* fade the hero scroll-cue out early so it never collides with the fixed nav */
+const scrollCue = $('.scroll-cue');
+function updateHeroCue() {
+  const fade = 1 - clamp(scrollY / (innerHeight * 0.35), 0, 1);
+  scrollCue.style.opacity = fade;
+  scrollCue.style.pointerEvents = fade > 0 ? 'auto' : 'none';
+}
+addEventListener('scroll', updateHeroCue, { passive: true });
+updateHeroCue();
+
+let last = performance.now();
+const tmpPos = new THREE.Vector3(), tmpLook = new THREE.Vector3(), tmpTan = new THREE.Vector3();
+
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000);
+  last = now;
+
+  RIG.prog = scrollProgress();
+  RIG.smooth = REDUCE ? RIG.prog : damp(RIG.smooth, RIG.prog, 4.2, dt);
+  RIG.mx = damp(RIG.mx, RIG.tmx, 3, dt);
+  RIG.my = damp(RIG.my, RIG.tmy, 3, dt);
+
+  const t = clamp(RIG.smooth, 0, 0.999);
+  curve.getPointAt(t, tmpPos);
+  curve.getTangentAt(t, tmpTan);
+  tmpLook.copy(tmpPos).add(tmpTan);
+
+  camera.position.copy(tmpPos);
+  camera.position.x += RIG.mx * 0.4;
+  camera.position.y += RIG.my * 0.22;
+  camera.lookAt(tmpLook.x + RIG.mx * 0.4, tmpLook.y + RIG.my * 0.22, tmpLook.z);
+
+  orbGroup.rotation.y += dt * (REDUCE ? 0 : 0.15);
+  orbGroup.rotation.x += dt * (REDUCE ? 0 : 0.05);
+
+  if (!REDUCE) {
+    pulses.forEach(p => {
+      p.t += dt * p.speed;
+      if (p.t > 1) p.t = 0;
+      p.mesh.position.lerpVectors(p.a, p.b, p.t);
+    });
+  }
+
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
