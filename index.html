@@ -105,30 +105,30 @@
   footer a{color:var(--green);text-decoration:none}
   footer .links{display:flex;gap:1.6rem;margin-top:1rem}
 
-  /* --- foreground placeholder layers (stand in for Leonardo cutouts) --- */
+  /* --- foreground cutout layers (Leonardo alpha props, pinned bottom of viewport) --- */
   .fg-stage{
     position:absolute;left:0;right:0;bottom:0;height:38vh;pointer-events:none;
     z-index:1;overflow:hidden;
   }
   .fg-prop{
-    position:absolute;bottom:0;padding:.4rem .7rem;font-family:var(--mono);font-size:.62rem;
-    color:var(--text-dim);border:1px dashed rgba(57,211,83,.35);border-radius:6px;
-    background:rgba(5,6,7,.55);
+    position:absolute;bottom:0;
     opacity:0;filter:blur(6px);transform:translateY(24px);
     transition:opacity .9s ease, filter .9s ease, transform .9s ease;
   }
+  .fg-prop img{display:block;height:26vh;width:auto;filter:drop-shadow(0 0 18px rgba(57,211,83,.25))}
   .fg-stage.fg-active .fg-prop{opacity:.85;filter:blur(0);transform:translateY(0)}
   .fg-stage.fg-retiring .fg-prop{opacity:0;filter:blur(10px);transform:translateY(10px)}
 
-  /* --- background plate placeholder --- */
+  /* --- background plate (Leonardo cinematic still, full-bleed per chapter) --- */
   .plate{
     position:absolute;inset:0;z-index:0;opacity:0;transition:opacity 1.2s ease;
     background:radial-gradient(ellipse at 30% 40%, rgba(57,211,83,.12), transparent 60%);
+    background-size:cover;background-position:center;
   }
-  section.in-view .plate{opacity:1}
-  .plate-tag{
-    position:absolute;top:1.6rem;right:2rem;font-family:var(--mono);font-size:.62rem;
-    color:var(--text-dim);opacity:.5;
+  section.in-view .plate{opacity:.55}
+  section.in-view .plate::after{
+    content:'';position:absolute;inset:0;
+    background:linear-gradient(180deg, rgba(5,6,7,.35), rgba(5,6,7,.75) 70%);
   }
 
   @media (max-width:640px){
@@ -148,6 +148,13 @@
     position:fixed;top:0;left:0;width:16px;height:16px;border-radius:50%;
     border:1px solid var(--green);z-index:999;pointer-events:none;
     transform:translate(-50%,-50%);transition:width .2s,height .2s,opacity .2s;
+  }
+
+  .footer {
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    justify-content: center;
   }
 </style>
 </head>
@@ -176,7 +183,7 @@
       <div class="label"><span class="dot"></span>CHAPTER 00 — BOOT<span class="rule"></span></div>
       <h1 data-reveal>Damon Wu</h1>
       <p class="lead">AI Agent Engineer &amp; Forward-Deployed Software Engineer.
-        I design and ship autonomous agents — on LangChain and the Claude Code SDK —
+        I design and ship autonomous agents — on LangChain and AI tools (eg: Claude Code) —
         that solve real business problems inside real production systems.</p>
       <div class="chapters">
         <span>01 Experience</span><span>02 Projects</span><span>03 Signal</span><span>04 Contact</span>
@@ -186,66 +193,66 @@
   </section>
 
   <section id="initialize" aria-label="About" data-chapter="1">
-    <div class="plate"></div><div class="plate-tag">plate: initialize-grid.webp</div>
+    <div class="plate" style="background-image:url('assets/generated/initialize-grid.webp')"></div>
     <div class="content-wrap">
       <div class="label"><span class="dot"></span>CHAPTER 01 — INITIALIZE<span class="rule"></span></div>
       <h2 data-reveal>Where agents meet the business.</h2>
       <p class="lead">I'm a software engineer specializing in TypeScript and JavaScript,
         focused on designing, building, and deploying autonomous AI agents inside real
         business workflows. I work close to the problem — embedded with teams, shipping
-        agentic systems on frameworks like LangChain and the Claude Code SDK — turning
+        agentic systems on frameworks like LangChain and AI tools (eg: Claude Code) — turning
         ambiguous business pain into working, production software.</p>
     </div>
     <div class="fg-stage" data-fg>
-      <div class="fg-prop" style="left:6%">terminal-frame.webp</div>
-      <div class="fg-prop" style="left:34%">connector-node.webp</div>
-      <div class="fg-prop" style="right:8%">signal-ribbon.webp</div>
+      <div class="fg-prop" style="left:6%"><img src="assets/foreground/terminal-frame.webp" alt="terminal frame"></div>
+      <div class="fg-prop" style="left:34%"><img src="assets/foreground/connector-node.webp" alt="connector node"></div>
+      <div class="fg-prop" style="right:8%"><img src="assets/foreground/signal-ribbon.webp" alt="signal ribbon"></div>
     </div>
   </section>
 
   <section id="experience" class="tall" aria-label="Experience" data-chapter="2">
-    <div class="plate"></div><div class="plate-tag">plate: node-cluster.webp</div>
+    <div class="plate" style="background-image:url('assets/generated/node-cluster.webp')"></div>
     <div class="content-wrap">
       <div class="label"><span class="dot"></span>CHAPTER 02 — EXPERIENCE<span class="rule"></span></div>
       <h2 data-reveal>Shipped in production.</h2>
       <div class="stack">
         <div class="card">
-          <div class="role-meta">2024 — PRESENT · FORWARD DEPLOYED ENGINEER · [COMPANY A]</div>
-          <h3>Embedded agent delivery</h3>
+          <div class="role-meta">FUTURE · FORWARD DEPLOYED ENGINEER · [Next Journey]</div>
+          <h3>To be defined</h3>
           <ul>
-            <li>Designed and deployed LangChain-based agent pipelines directly inside client workflows, replacing manual triage processes.</li>
-            <li>Built internal tool-calling integrations connecting agents to existing business systems (CRM, ticketing, data warehouses).</li>
-            <li>Owned the full loop from ambiguous business ask to measured production outcome.</li>
+            <li>To be defined</li>
+            <li>To be defined</li>
+            <li>To be defined</li>
           </ul>
         </div>
         <div class="card">
-          <div class="role-meta">2022 — 2024 · AI SOLUTIONS ENGINEER · [COMPANY B]</div>
-          <h3>Agent platform &amp; evaluation</h3>
+          <div class="role-meta">2026 — 2026 · AI SOLUTIONS ENGINEER · [Personal]</div>
+          <h3>Project: <a style="color:var(--green);" href="https://github.com/damengrandom/oh-my-workers" target="_blank" rel="noopener noreferrer">Oh My Workers</a></h3>
           <ul>
-            <li>Built evaluation and observability tooling for agent behavior in production.</li>
-            <li>Shipped Claude Code SDK-based internal developer tooling adopted org-wide.</li>
-            <li>Partnered with non-technical stakeholders to translate business pain into agent specs.</li>
+            <li>Designed and implemented a multi-tool agent that automates support triage across three internal systems.</li>
+            <li>Daily CornJob for Github trending projects and AI news subscription by Telegram bot.</li>
+            <li>Evaluate agents performance by creating eval functions.</li>
           </ul>
         </div>
         <div class="card">
-          <div class="role-meta">2020 — 2022 · SOFTWARE DEVELOPMENT ENGINEER · [COMPANY C]</div>
-          <h3>Full-stack foundations</h3>
+          <div class="role-meta">2025 — 2026 · SOFTWARE DEVELOPMENT ENGINEER · [LYKA]</div>
+          <h3>Customer support AI solution</h3>
           <ul>
-            <li>Built and maintained TypeScript/Node services powering core product workflows.</li>
-            <li>Owned front-end architecture for internal tools used by cross-functional teams.</li>
+            <li>Enhanced customer support efficiency by embedding AI-driven automation within Zendesk, streamlining processes for subscription management requests.</li>
+            <li>Evaluated multiple AI solutions and collaborated with stakeholders to present strategic proposals, ensuring alignment between technological innovation and business needs.</li>
           </ul>
         </div>
       </div>
     </div>
     <div class="fg-stage" data-fg>
-      <div class="fg-prop" style="left:10%">cable-bundle.webp</div>
-      <div class="fg-prop" style="left:44%">circuit-fragment.webp</div>
-      <div class="fg-prop" style="right:6%">terminal-frame.webp</div>
+      <div class="fg-prop" style="left:10%"><img src="assets/foreground/cable-bundle.webp" alt="cable bundle"></div>
+      <div class="fg-prop" style="left:44%"><img src="assets/foreground/circuit-fragment.webp" alt="circuit fragment"></div>
+      <div class="fg-prop" style="right:6%"><img src="assets/foreground/terminal-frame.webp" alt="terminal frame"></div>
     </div>
   </section>
 
   <section id="projects" class="tall" aria-label="Projects" data-chapter="3">
-    <div class="plate"></div><div class="plate-tag">plate: pulse-transit.webp</div>
+    <div class="plate" style="background-image:url('assets/generated/pulse-transit.webp')"></div>
     <div class="content-wrap">
       <div class="label"><span class="dot"></span>CHAPTER 03 — PROJECTS<span class="rule"></span></div>
       <h2 data-reveal>Agents in the wild.</h2>
@@ -259,11 +266,11 @@
           </ul>
         </div>
         <div class="card">
-          <div class="role-meta">CLAUDE CODE SDK · DEV TOOLING</div>
+          <div class="role-meta">CLAUDE CODE · DEV TOOLING</div>
           <h3>Codebase Copilot</h3>
           <ul>
             <li>Internal agent that answers codebase questions and drafts PRs against real repos.</li>
-            <li>Built on the Claude Code SDK with custom tool definitions for the org's stack.</li>
+            <li>Built on the Claude Code with custom tool definitions for the org's stack.</li>
           </ul>
         </div>
         <div class="card">
@@ -276,8 +283,8 @@
       </div>
     </div>
     <div class="fg-stage" data-fg>
-      <div class="fg-prop" style="left:14%">code-glyphs.webp</div>
-      <div class="fg-prop" style="right:12%">signal-ribbon.webp</div>
+      <div class="fg-prop" style="left:14%"><img src="assets/foreground/code-glyphs.webp" alt="code glyphs"></div>
+      <div class="fg-prop" style="right:12%"><img src="assets/foreground/signal-ribbon.webp" alt="signal ribbon"></div>
     </div>
   </section>
 
@@ -286,17 +293,24 @@
       <div class="label"><span class="dot"></span>CHAPTER 04 — SIGNAL<span class="rule"></span></div>
       <h2 data-reveal>Stack.</h2>
       <div class="rail">
-        <span class="chip">TypeScript</span><span class="chip">Node.js</span>
-        <span class="chip">LangChain</span><span class="chip">Claude Code SDK</span>
-        <span class="chip">React</span><span class="chip">Three.js / WebGL</span>
-        <span class="chip">Agent orchestration</span><span class="chip">Prompt engineering</span>
-        <span class="chip">Eval &amp; observability</span><span class="chip">AWS / GCP</span>
+        <span class="chip">HTML</span>
+        <span class="chip">CSS</span>
+        <span class="chip">TypeScript + JavaScript</span>
+        <span class="chip">Frameworks & Libraries: React + Vue</span>
+        <span class="chip">Node.js</span>
+        <span class="chip">SQL</span>
+        <span class="chip">LangChain</span>
+        <span class="chip">Claude Code</span>
+        <span class="chip">Kubernetes</span>      
+        <span class="chip">Docker</span>
+        <span class="chip">AI Engineering (Prompt/Context/Harness/Loop/?)</span>
+        <span class="chip">Eval &amp; Observability</span>
       </div>
     </div>
   </section>
 
   <section id="afterlight" aria-label="Contact" data-chapter="5">
-    <div class="plate"></div><div class="plate-tag">plate: afterlight-wide.webp</div>
+    <div class="plate" style="background-image:url('assets/generated/afterlight-wide.webp')"></div>
     <div class="content-wrap">
       <div class="label"><span class="dot"></span>CHAPTER 05 — AFTERLIGHT<span class="rule"></span></div>
       <h2 data-reveal>Let's build the agent.</h2>
@@ -304,16 +318,16 @@
         agents into real workflows is the job.</p>
     </div>
     <div class="fg-stage" data-fg>
-      <div class="fg-prop" style="left:20%">connector-node.webp</div>
+      <div class="fg-prop" style="left:20%"><img src="assets/foreground/connector-node.webp" alt="connector node"></div>
     </div>
   </section>
 
-  <footer>
-    <div>© 2026 Damon Wu — placeholder copy, swap in real details.</div>
+  <footer class="footer">
+    <div>© 2026 Damon Wu — Built with love ❤️.</div>
     <div class="links">
-      <a href="mailto:damonmaozewu@gmail.com">email</a>
-      <a href="#">github</a>
-      <a href="#">linkedin</a>
+      <a href="mailto:damonmaozewu@gmail.com" target="_blank" rel="noopener">email</a>
+      <a href="https://github.com/damengrandom" target="_blank" rel="noopener">github</a>
+      <a href="https://www.linkedin.com/in/damon-wu-aab280107" target="_blank" rel="noopener">linkedin</a>
     </div>
   </footer>
 
