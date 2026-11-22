@@ -13,7 +13,7 @@
         --green: #39d353;
         --amber: #d29922;
         --text: #e6edf3;
-        --text-dim: #8b949e;
+        --text-dim: #b1bac4;
         --mono: ui-monospace, "SF Mono", "JetBrains Mono", "IBM Plex Mono", Menlo, Consolas, monospace;
         --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
       }
@@ -71,7 +71,7 @@
         justify-content: space-between;
         padding: 1.4rem 2rem;
         font-family: var(--mono);
-        font-size: 0.72rem;
+        font-size: 0.82rem;
         letter-spacing: 0.08em;
         pointer-events: none;
       }
@@ -98,11 +98,18 @@
       nav a {
         color: var(--text-dim);
         text-decoration: none;
-        transition: color 0.3s;
+        padding-bottom: 0.25rem;
+        border-bottom: 1px solid transparent;
+        transition:
+          color 0.3s,
+          border-color 0.3s;
       }
       nav a:hover,
       nav a.active {
         color: var(--green);
+      }
+      nav a.active {
+        border-bottom-color: var(--green);
       }
 
       main {
@@ -236,16 +243,48 @@
       .stack {
         display: flex;
         flex-direction: column;
-        gap: 5rem;
+        gap: 1.75rem;
         margin-top: 2rem;
+        max-width: 880px;
       }
       .card {
+        position: relative;
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 10px;
         padding: 1.8rem 2rem;
         background: linear-gradient(180deg, rgba(14, 68, 41, 0.14), rgba(5, 6, 7, 0.5));
         backdrop-filter: blur(6px);
-        max-width: 720px;
+        transition:
+          border-color 0.2s,
+          transform 0.2s;
+      }
+      .card:hover {
+        border-color: rgba(57, 211, 83, 0.45);
+        transform: translateY(-2px);
+      }
+      /* experience timeline: vertical rule + a dot per role */
+      .timeline {
+        padding-left: 2rem;
+        border-left: 1px solid rgba(57, 211, 83, 0.25);
+      }
+      .timeline .card::before {
+        content: "";
+        position: absolute;
+        left: calc(-2rem - 5px);
+        top: 2.1rem;
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 10px var(--green);
+      }
+      /* projects: two columns on wide screens */
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+        max-width: 1000px;
       }
       .card .role-meta {
         font-family: var(--mono);
@@ -256,22 +295,29 @@
       }
       .card h3 {
         margin: 0.2rem 0 0.8rem;
-        font-family: var(--mono);
-        font-size: 1.3rem;
+        font-family: var(--sans);
+        font-weight: 600;
+        font-size: 1.35rem;
+        letter-spacing: -0.01em;
         color: var(--text);
       }
       .card h3 a {
         color: inherit;
         text-decoration: none;
       }
+      .card h3 a::after {
+        content: " ↗";
+        color: var(--green);
+        font-size: 0.9em;
+      }
       .card h3 a:hover {
-        text-decoration: underline;
+        color: var(--green);
       }
       .card ul {
         margin: 0;
         padding-left: 1.1rem;
         color: var(--text-dim);
-        font-size: 0.92rem;
+        font-size: 1rem;
         line-height: 1.7;
       }
       .card ul li::marker {
@@ -378,12 +424,27 @@
         section {
           padding: 0 1.2rem;
         }
+        .timeline {
+          padding-left: 1.2rem;
+        }
+        .timeline .card::before {
+          left: calc(-1.2rem - 5px);
+        }
+        .card {
+          padding: 1.4rem 1.3rem;
+        }
         .fg-stage {
           height: 24vh;
         }
       }
 
       @media (prefers-reduced-motion: reduce) {
+        .card {
+          transition: none;
+        }
+        .card:hover {
+          transform: none;
+        }
         .word {
           opacity: 1 !important;
           transform: none !important;
@@ -480,7 +541,7 @@
         <div class="content-wrap">
           <div class="label"><span class="dot"></span>CHAPTER 02 — EXPERIENCE<span class="rule"></span></div>
           <h2 data-reveal>Shipped in production.</h2>
-          <div class="stack">
+          <div class="stack timeline">
             <div class="card">
               <div class="role-meta">2025 — PRESENT · LYKA</div>
               <h3>Full-Stack Engineer</h3>
@@ -523,7 +584,7 @@
         <div class="content-wrap">
           <div class="label"><span class="dot"></span>CHAPTER 03 — PROJECTS<span class="rule"></span></div>
           <h2 data-reveal>Agents in the wild.</h2>
-          <div class="stack">
+          <div class="grid">
             <div class="card">
               <div class="role-meta">TYPESCRIPT · LANGGRAPH · LANGSMITH · GITHUB ACTIONS</div>
               <h3><a href="https://github.com/damengrandom/oh-my-workers" target="_blank" rel="noopener noreferrer">Oh My Workers</a></h3>
@@ -577,7 +638,7 @@
       </section>
 
       <footer class="footer">
-        <div>© 2026 Damon Wu — Built with love ❤️.</div>
+        <div>© <span id="year">2026</span> Damon Wu — Built with love ❤️.</div>
         <div class="links">
           <a href="mailto:damonmaozewu@gmail.com" target="_blank" rel="noopener">Email</a>
           <a href="https://github.com/damengrandom" target="_blank" rel="noopener">GitHub</a>
@@ -592,6 +653,7 @@
       const REDUCE = matchMedia("(prefers-reduced-motion: reduce)").matches;
       const $ = (s) => document.querySelector(s);
       const $$ = (s) => Array.from(document.querySelectorAll(s));
+      $("#year").textContent = new Date().getFullYear();
       const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
       const lerp = (a, b, t) => a + (b - a) * t;
       const damp = (cur, to, rate, dt) => lerp(cur, to, 1 - Math.exp(-rate * dt));
